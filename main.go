@@ -7,12 +7,12 @@ import (
 
 func serveIndex(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
-		http.NotFound(w, r)
+		http.Error(w, "not found", http.StatusNotFound)
 		return
 	}
 
 	if r.Method != "GET" {
-		http.NotFound(w, r)
+		http.Error(w, "method not found", http.StatusNotFound)
 		return
 	}
 
@@ -20,10 +20,13 @@ func serveIndex(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	hub := NewHub()
+	go hub.run()
+
 	http.HandleFunc("/", serveIndex)
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		serveWs(hub, w, r)
 	})
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe("192.168.1.71:8080", nil))
 }
